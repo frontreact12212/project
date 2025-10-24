@@ -1,33 +1,40 @@
-import {createSlice} from "@reduxjs/toolkit";
+import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import axios from "axios";
+
+export const fetchTodos = createAsyncThunk("todos/fetchTodos",
+    async(_, {rejectWithValue})=> {
+    try{
+        const res = await axios.get("http://localhost:3000/list")
+        return res.data
+    }catch(error){
+        return rejectWithValue(error.message)
+    }
+    })
 
 const todoSlice = createSlice({
-    name: "Todos",
+    name: "todos",
     initialState: {
-        todos: [
-            {
-                id: 1,
-                title: 'Hello Ashxarh',
-            }
-        ],
+        todos: [],
+        loading: false,
+        error: null
     },
-    reducers: {
-        addTodo: (state, action) => {
-            state.todos.push({
-                id: Math.random(),
-                title: action.payload
-            })
-        },
-        deleteTodo: (state, action) => {
-            state.todos = state.todos.filter(el => el.id !== action.payload)
-        },
-        removeTodo: (state, action) => {
-            state.todos = action.payload
-        },
-        editTodo: (state, action) => {
-            state.todos = state.todos.map(el => el.id === action.payload.id ? {id: action.payload.id, title: action.payload.title} : el)
-        }
+    reducers: {},
+    extraReducers: (builder) => {
+        builder
+            .addCase(fetchTodos.pending, ((state)=>{
+                state.loading = true;
+                state.error = null;
+            }))
+            .addCase(fetchTodos.fulfilled, ((state, action)=>{
+                state.loading = false;
+                state.todos = action.payload;
+            }))
+            .addCase(fetchTodos.rejected, ((state, action)=>{
+                state.loading = false;
+                state.error = action.payload;
+            }))
     }
 })
 
-export const {addTodo, deleteTodo,removeTodo,editTodo} = todoSlice.actions;
+
 export default todoSlice.reducer;

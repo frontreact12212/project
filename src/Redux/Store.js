@@ -1,8 +1,8 @@
 import {configureStore} from "@reduxjs/toolkit";
-import TodoList from './Silces/TodoList.jsx';
+import TodoReducer from './Silces/TodoList.jsx';
 
 export const store = configureStore({
     reducer: {
-        todo: TodoList,
+        todos: TodoReducer,
     }
 })
